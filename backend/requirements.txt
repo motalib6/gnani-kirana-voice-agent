@@ -1,0 +1,6 @@
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+requests>=2.31
+# gnani-vachana is required for real mode, harmless in mock mode.
+gnani-vachana>=0.8.2

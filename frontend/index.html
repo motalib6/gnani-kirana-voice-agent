@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolkar Order Karo — Kirana Hinglish Voice Agent</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; line-height: 1.5; }
+  button { padding: 10px 16px; font-size: 16px; cursor: pointer; }
+  input, textarea { width: 100%; padding: 10px; font-size: 16px; margin: 6px 0 12px; }
+  .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0; }
+  .muted { color: #555; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>Bolkar Order Karo</h1>
+<p class="muted">Kirana Hinglish voice order agent. Gnani Prisma STT + Timbre TTS.
+Synthetic demo data only — no real customer data.</p>
+
+<div class="card">
+  <h2>1. Bolo ya likho</h2>
+  <p class="muted">Backend pehle <code>uvicorn app.main:app --reload --port 8000</code> se chalao (backend/ folder se).</p>
+  <label>Test ke liye Hinglish text (mock mode me yehi transcript banega):</label>
+  <input id="mockText" value="2 kg atta aur 1 litre tel chahiye">
+  <button id="recordBtn">🎙️ Record (browser mic)</button>
+  <button id="sendBtn">Order bhejo</button>
+  <p id="recStatus" class="muted"></p>
+</div>
+
+<div class="card">
+  <h2>2. Agent ka jawab</h2>
+  <p><b>Transcript:</b> <span id="transcript">—</span></p>
+  <p><b>Confirmation:</b> <span id="confirmation">—</span></p>
+  <p><b>Total:</b> <span id="total">—</span></p>
+  <ul id="items"></ul>
+  <button id="saveBtn" disabled>Shopkeeper ko order bhejo (Save)</button>
+</div>
+
+<div class="card">
+  <h2>3. Shopkeeper dashboard</h2>
+  <button id="refreshBtn">Orders refresh karo</button>
+  <ul id="orders"></ul>
+</div>
+
+<div class="card">
+  <h2>4. RAG search (sirf dukaan ka data)</h2>
+  <p class="muted">Jaise: "delivery kab hoti hai?" ya "atta ka rate?"</p>
+  <input id="searchBox" value="delivery kab hoti hai?">
+  <button id="searchBtn">Search karo</button>
+  <ul id="searchResults"></ul>
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+let lastOrder = null;
+let mediaRecorder = null, chunks = [];
+
+document.getElementById("recordBtn").onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      document.getElementById("recStatus").textContent =
+        "Recording ready. Mock mode me text wala transcript use hoga — real mode me ye audio file backend ko jayegi.";
+      window._audioBlob = new Blob(chunks, { type: "audio/webm" });
+    };
+    mediaRecorder.start();
+    document.getElementById("recStatus").textContent = "Recording... dobara dabao to stop hoga.";
+    document.getElementById("recordBtn").onclick = () => {
+      mediaRecorder.stop();
+      document.getElementById("recordBtn").textContent = "🎙️ Record (browser mic)";
+    };
+    document.getElementById("recordBtn").textContent = "⏹️ Stop recording";
+  } catch (e) {
+    document.getElementById("recStatus").textContent = "Mic nahi mila: " + e.message + " — text box se test karo.";
+  }
+};
+
+document.getElementById("sendBtn").onclick = async () => {
+  const form = new FormData();
+  form.append("mock_text", document.getElementById("mockText").value);
+  form.append("customer_name", "Demo Customer");
+  if (window._audioBlob) form.append("file", window._audioBlob, "order.webm");
+  const res = await fetch(API + "/api/voice-order", { method: "POST", body: form });
+  const data = await res.json();
+  document.getElementById("transcript").textContent = data.transcript || "—";
+  document.getElementById("confirmation").textContent = data.confirmation_text || "—";
+  document.getElementById("total").textContent = data.total != null ? "Rs " + data.total : "—";
+  document.getElementById("items").innerHTML = (data.items || []).map(i =>
+    `<li>${i.quantity} ${i.unit} ${i.item} — Rs ${i.line_total}</li>`).join("");
+  lastOrder = data;
+  document.getElementById("saveBtn").disabled = !(data.items && data.items.length);
+};
+
+document.getElementById("saveBtn").onclick = async () => {
+  await fetch(API + "/api/orders", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customer_name: "Demo Customer", items: lastOrder.items, total: lastOrder.total }) });
+  loadOrders();
+};
+
+async function loadOrders() {
+  const res = await fetch(API + "/api/orders");
+  const data = await res.json();
+  document.getElementById("orders").innerHTML = (data.orders || []).map(o =>
+    `<li>#${o.id} — Rs ${o.total} — ${o.status} — ${o.items.map(i => i.quantity + " " + i.unit + " " + i.item).join(", ")}
+     <button onclick="setStatus(${o.id}, 'accept')">Accept</button>
+     <button onclick="setStatus(${o.id}, 'reject')">Reject</button></li>`).join("") || "<li>Abhi koi order nahi.</li>";
+}
+async function setStatus(id, action) {
+  await fetch(API + "/api/orders/" + id + "/" + action, { method: "POST" });
+  loadOrders();
+}
+document.getElementById("refreshBtn").onclick = loadOrders;
+document.getElementById("searchBtn").onclick = async () => {
+  const q = document.getElementById("searchBox").value;
+  const res = await fetch(API + "/api/search?q=" + encodeURIComponent(q));
+  const data = await res.json();
+  document.getElementById("searchResults").innerHTML = (data.results || []).map(r =>
+    `<li>[${r.type}] ${r.text}</li>`).join("") || "<li>Kuch nahi mila — agent rate guess nahi karega.</li>";
+};
+loadOrders();
+</script>
+</body>
+</html>

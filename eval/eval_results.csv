@@ -1,0 +1,21 @@
+input,expected_total,actual_total,pass,items
+2 kg atta aur 1 litre tel chahiye,240,240.0,True,"[{'item': 'atta', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 90.0}, {'item': 'tel', 'quantity': 1.0, 'unit': 'litre', 'price_per_unit': 150, 'line_total': 150.0}]"
+1 kg chini,42,42.0,True,"[{'item': 'chini', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 42, 'line_total': 42.0}]"
+do kg chawal,120,120.0,True,"[{'item': 'chawal', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 60, 'line_total': 120.0}]"
+atta chahiye,45,45.0,True,"[{'item': 'atta', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 45.0}]"
+5 kg gold chahiye,0,0,True,[]
+teen kg dal aur 2 kg namak,380,380.0,True,"[{'item': 'dal', 'quantity': 3.0, 'unit': 'kg', 'price_per_unit': 110, 'line_total': 330.0}, {'item': 'namak', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 25, 'line_total': 50.0}]"
+1 litre tel,150,150.0,True,"[{'item': 'tel', 'quantity': 1.0, 'unit': 'litre', 'price_per_unit': 150, 'line_total': 150.0}]"
+2 kg chawal aur 1 kg dal,230,230.0,True,"[{'item': 'chawal', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 60, 'line_total': 120.0}, {'item': 'dal', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 110, 'line_total': 110.0}]"
+paanch kg atta,225,225.0,True,"[{'item': 'atta', 'quantity': 5.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 225.0}]"
+aadha kg chini,21,21.0,True,"[{'item': 'chini', 'quantity': 0.5, 'unit': 'kg', 'price_per_unit': 42, 'line_total': 21.0}]"
+2 kg aata chahiye,90,90.0,True,"[{'item': 'atta', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 90.0}]"
+2 kg chaval chahiye,120,120.0,True,"[{'item': 'chawal', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 60, 'line_total': 120.0}]"
+1 kg daal,110,110.0,True,"[{'item': 'dal', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 110, 'line_total': 110.0}]"
+1 kg cheeni,42,42.0,True,"[{'item': 'chini', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 42, 'line_total': 42.0}]"
+1 litre tail chahiye,150,150.0,True,"[{'item': 'tel', 'quantity': 1.0, 'unit': 'litre', 'price_per_unit': 150, 'line_total': 150.0}]"
+2 kg atta and 1 litre oil please,240,240.0,True,"[{'item': 'atta', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 90.0}, {'item': 'tel', 'quantity': 1.0, 'unit': 'litre', 'price_per_unit': 150, 'line_total': 150.0}]"
+ek kg namak aur ek sabun,60,60.0,True,"[{'item': 'namak', 'quantity': 1.0, 'unit': 'kg', 'price_per_unit': 25, 'line_total': 25.0}, {'item': 'sabun', 'quantity': 1.0, 'unit': 'piece', 'price_per_unit': 35, 'line_total': 35.0}]"
+10 kg chawal,600,600.0,True,"[{'item': 'chawal', 'quantity': 10.0, 'unit': 'kg', 'price_per_unit': 60, 'line_total': 600.0}]"
+"3 kg atta, 2 kg chini, 1 litre tel",369,369.0,True,"[{'item': 'atta', 'quantity': 3.0, 'unit': 'kg', 'price_per_unit': 45, 'line_total': 135.0}, {'item': 'tel', 'quantity': 1.0, 'unit': 'litre', 'price_per_unit': 150, 'line_total': 150.0}, {'item': 'chini', 'quantity': 2.0, 'unit': 'kg', 'price_per_unit': 42, 'line_total': 84.0}]"
+kuch nahi chahiye,0,0,True,[]
