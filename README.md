@@ -1,8 +1,30 @@
-# Bolkar Order Karo — Kirana Hinglish Voice Order Agent
+# 🛒 Bolkar Order Karo — Kirana Hinglish Voice Order Agent
 
-**Built for: The Great Indian AI Internship Challenge, Gnani.ai**
-**Deadline: 10 November 2026, 11:59 PM IST — one entry only**
-**Gnani technology used: Prisma v2.5 Speech-to-Text + Timbre v2.5 Text-to-Speech via app.gnani.ai / docs.gnani.ai**
+> ### “Bolo, aur order ho gaya.”
+> **Speak in Hinglish. Your kirana order is understood, priced from the real shop list, confirmed by voice, and sent to the shopkeeper — no English typing, no paper, no missed calls.**
+
+| | |
+|---|---|
+| 🏆 **Challenge** | Great Indian AI Internship Challenge, Gnani.ai |
+| ⏰ **Deadline** | **10 November 2026, 11:59 PM IST — one entry only** |
+| 🎙️ **Gnani tech** | Prisma v2.5 STT + Timbre v2.5 TTS via app.gnani.ai |
+| ✅ **Tested** | Parser eval **20 / 20 PASS** • Live server tested • WebSocket voice pipeline tested |
+| 🌐 **Website** | Open `website/index.html` — classical shop-style landing page with a live order demo inside |
+
+### ✨ Try it in 30 seconds (no key, no install)
+
+1. Open **`website/index.html`** in any browser.
+2. Type: `2 kg atta aur 1 litre tel chahiye`
+3. See the total **₹240**, the Hinglish confirmation, and the shopkeeper flow.
+4. Also try the noisy test (`2 kg aata`) and the unknown test (`5 kg gold`) — the agent must **not** invent a price for gold.
+
+### 🎭 Why it is not just another chatbot
+
+- 🗣️ **Hinglish first** — code-mix, Hindi numbers (`do kg`, `teen kg`), and noisy phone-like audio
+- 💰 **No invented prices** — only the shop price list, otherwise clarification / human handoff
+- 🔊 **Voice back** — Gnani TTS speaks the confirmation, so a wrong order is caught before saving
+- 🧑‍🌾 **Real user** — kirana customer + shopkeeper, not a toy demo
+- 📊 **Measured** — eval sheet, latency, and cost notes, not “100% accuracy” claims
 
 > Synthetic demo data only. No real phone numbers, Aadhaar, PAN, bank details
 > or real customer calls are used in this project or its demo.

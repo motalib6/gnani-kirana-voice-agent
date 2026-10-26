@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolkar Order Karo — Kirana Hinglish Voice Agent</title>
+<meta name="description" content="Speak in Hinglish. Your kirana order is understood, priced from the real shop list, confirmed by voice, and sent to the shopkeeper. Built on Gnani AI.">
+<style>
+  :root{
+    --cream:#fdf6e3; --cream2:#f7ead0; --ink:#2b1d12; --maroon:#7b2d26;
+    --gold:#b8860b; --gold2:#d4af37; --green:#2e6b34; --card:#fffdf5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif;line-height:1.6}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px 60px}
+  /* Classical shop signboard */
+  .sign{text-align:center;padding:42px 16px 28px;
+    background:linear-gradient(180deg,#7b2d26,#5e211d);color:#fdf6e3;
+    border-bottom:6px double var(--gold2)}
+  .sign .small{letter-spacing:4px;text-transform:uppercase;font-size:12px;color:#e8c874}
+  .sign h1{font-size:52px;line-height:1.05;margin:10px 0 6px;font-weight:700}
+  .sign p{font-style:italic;font-size:20px;margin:0;color:#f7ead0}
+  .orn{text-align:center;color:var(--gold);font-size:22px;letter-spacing:8px;margin:22px 0}
+  .badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+  .badge{border:1px solid var(--gold);border-radius:999px;padding:6px 14px;
+    background:var(--card);font-family:system-ui,sans-serif;font-size:13px}
+  .badge b{color:var(--maroon)}
+  h2{font-size:32px;color:var(--maroon);text-align:center;margin:36px 0 8px}
+  .sub{text-align:center;font-style:italic;color:#6b543a;margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid #e2c98a;border-top:4px solid var(--maroon);
+    border-radius:14px;padding:18px;box-shadow:0 4px 18px rgba(43,29,18,.08)}
+  .card h3{margin:0 0 6px;color:var(--maroon);font-size:20px}
+  .card p{margin:0;font-family:system-ui,sans-serif;font-size:15px}
+  .demo{background:var(--card);border:2px solid var(--gold2);border-radius:18px;padding:24px;
+    box-shadow:0 8px 30px rgba(43,29,18,.12)}
+  input,button{font-size:17px;padding:12px 14px;border-radius:10px}
+  input{width:100%;border:1px solid #c9a86a;font-family:Georgia,serif}
+  button{border:0;background:var(--maroon);color:#fff;cursor:pointer;font-family:system-ui,sans-serif}
+  button.secondary{background:#fff;color:var(--maroon);border:1px solid var(--maroon)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .row button{flex:1;min-width:160px}
+  .result{margin-top:16px;background:var(--cream2);border-radius:12px;padding:16px;display:none}
+  .result.show{display:block}
+  .total{font-size:26px;color:var(--maroon)}
+  .steps{counter-reset:step}
+  .step{display:flex;gap:14px;margin:14px 0}
+  .step b{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:var(--maroon);
+    color:#fff;display:grid;place-items:center;font-family:system-ui,sans-serif}
+  table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:15px}
+  th,td{border-bottom:1px solid #e2c98a;padding:10px;text-align:left}
+  th{color:var(--maroon)}
+  .cta{text-align:center;background:#2b1d12;color:#fdf6e3;border-radius:18px;padding:28px}
+  .cta a{color:#e8c874}
+  footer{text-align:center;color:#6b543a;font-size:14px;margin-top:36px}
+  @media(max-width:600px){.sign h1{font-size:38px}}
+</style>
+</head>
+<body>
+<header class="sign">
+  <div class="small">✦ &nbsp;Sharma Kirana Store &nbsp;✦&nbsp; Est. Trust, Since Always</div>
+  <h1>Bolkar Order Karo</h1>
+  <p>“Bolo, aur order ho gaya.” — Speak in Hinglish, order done.</p>
+</header>
+
+<main class="wrap">
+  <div class="orn">❦ &nbsp; ❦ &nbsp; ❦</div>
+
+  <div class="badges">
+    <span class="badge">🎙️ Gnani <b>Prisma STT</b> + <b>Timbre TTS</b></span>
+    <span class="badge">✅ Parser eval <b>20 / 20 PASS</b></span>
+    <span class="badge">🏆 Great Indian <b>AI Internship Challenge</b></span>
+    <span class="badge">🛒 No invented prices</span>
+  </div>
+
+  <h2>Try it right here, no app needed</h2>
+  <p class="sub">Type a Hinglish order exactly as you would speak it. This page uses the same shop price list as the backend.</p>
+
+  <section class="demo">
+    <label for="orderText"><b>Apna order bolo (likh kar try karo):</b></label>
+    <input id="orderText" value="2 kg atta aur 1 litre tel chahiye">
+    <div class="row">
+      <button id="tryBtn">▶ &nbsp;Order samjho</button>
+      <button class="secondary" id="noisyBtn">Noisy test: “2 kg aata”</button>
+      <button class="secondary" id="unknownBtn">Unknown test: “5 kg gold”</button>
+    </div>
+    <div class="result" id="result">
+      <div><b>Samjha gaya:</b> <span id="rText"></span></div>
+      <div id="rItems"></div>
+      <div class="total" id="rTotal"></div>
+      <p id="rConfirm" style="font-style:italic"></p>
+      <div class="row">
+        <button id="saveBtn">Shopkeeper ko bhejo</button>
+      </div>
+      <p id="savedMsg" style="color:var(--green)"></p>
+    </div>
+    <p style="font-size:14px;color:#6b543a">Live voice (mic + real Gnani API) backend me chalta hai — <code>backend/</code> me server chalao, phir <code>frontend/index.html</code> kholo. Ye page demo ke liye text version hai, taaki koi bhi turant samajh sake.</p>
+  </section>
+
+  <h2>The old problem, solved the old way — by speaking</h2>
+  <p class="sub">Typing an order in English is slow. Calling the shop means waiting, writing it down, and remembering prices. This agent does all three, by voice.</p>
+  <div class="grid">
+    <div class="card"><h3>🗣️ Customer bolta hai</h3><p>Hinglish me, jaise ghar par baat karte ho. English type karne ki zaroorat nahi.</p></div>
+    <div class="card"><h3>🧠 Agent samajhta hai</h3><p>Gnani STT sunta hai, agent sirf dukaan ki price list se rate nikalta hai. Rate guess nahi hota.</p></div>
+    <div class="card"><h3>🔊 Bolkar confirm karta hai</h3><p>Gnani TTS Hinglish me total bolkar sunata hai, taaki galat order pakda ja sake.</p></div>
+    <div class="card"><h3>🧑‍🌾 Dukandar accept karta hai</h3><p>Order dashboard par aata hai. Ek tap me accept ya reject, kagaz par likhne ki zaroorat nahi.</p></div>
+  </div>
+
+  <h2>How it works</h2>
+  <div class="step"><b>1</b><div><b>Speak.</b> Customer phone ya browser par Hinglish me order bolta hai.</div></div>
+  <div class="step"><b>2</b><div><b>Listen.</b> Gnani Prisma STT usko text banata hai, shor wali audio par bhi.</div></div>
+  <div class="step"><b>3</b><div><b>Match &amp; total.</b> Agent price list se item dhoondhta hai, total nikalta hai, aur unknown item par haath nahi uthata — clarification poochhta hai.</div></div>
+  <div class="step"><b>4</b><div><b>Confirm &amp; handoff.</b> Gnani Timbre TTS bolkar confirm karta hai. Customer “haan” bole to order save, “nahi” bole to cancel, mushkil case me dukandar ko handoff.</div></div>
+
+  <h2>Shop price list — synthetic demo data</h2>
+  <p class="sub">Real shop ka rate yahan nahi hai. Ye demo list sirf test ke liye hai.</p>
+  <table>
+    <tr><th>Item</th><th>Rate</th><th>Item</th><th>Rate</th></tr>
+    <tr><td>Atta</td><td>₹45 / kg</td><td>Chawal</td><td>₹60 / kg</td></tr>
+    <tr><td>Tel</td><td>₹150 / litre</td><td>Dal</td><td>₹110 / kg</td></tr>
+    <tr><td>Chini</td><td>₹42 / kg</td><td>Namak</td><td>₹25 / kg</td></tr>
+    <tr><td>Sabun</td><td>₹35 / piece</td><td>—</td><td>—</td></tr>
+  </table>
+
+  <h2>Why this wins, honestly</h2>
+  <div class="grid">
+    <div class="card"><h3>🎭 Mixed Vibes</h3><p>Hinglish code-mix, beech me language badalna bhi chalta hai.</p></div>
+    <div class="card"><h3>🌾 Real Deal</h3><p>Kisan, kirana, chhota dukandar — roz ka asli kaam, sirf demo nahi.</p></div>
+    <div class="card"><h3>🔇 Noise Canceller</h3><p>Noisy aur phone-jaisi audio par test kiya gaya, failure ke saath.</p></div>
+    <div class="card"><h3>🏡 Small Town, Big Build</h3><p>Jajpur, Odisha se bana — Tier 2/3 ki kahani, metro copy nahi.</p></div>
+  </div>
+
+  <h2>Tested, not just claimed</h2>
+  <p style="text-align:center">Parser eval: <b>20 / 20 PASS</b> &nbsp;•&nbsp; Live server: health, order, search, accept, WebSocket confirm — sab tested &nbsp;•&nbsp; Failures chhupaye nahi, eval sheet me likhe hain.</p>
+
+  <div class="cta">
+    <h2 style="color:#fdf6e3;margin-top:0">Code, demo aur submission — sab khula hai</h2>
+    <p>Backend, frontend, eval sheet, 60-second demo script aur LinkedIn post draft sab isi repo me hai.<br>
+    GitHub: <a href="https://github.com/motalib6/gnani-kirana-voice-agent">github.com/motalib6/gnani-kirana-voice-agent</a><br>
+    Challenge: Great Indian AI Internship Challenge, Gnani.ai — deadline 10 Nov 2026, 11:59 PM IST.</p>
+  </div>
+
+  <footer>Bolkar Order Karo • Built on Gnani Prisma STT + Timbre TTS • Synthetic demo data only • No real phone numbers or personal data used.</footer>
+</main>
+
+<script>
+const PRODUCTS = [
+  {item:"atta", aliases:["atta","aata","wheat flour"], price:45, unit:"kg"},
+  {item:"chawal", aliases:["chawal","chaval","rice"], price:60, unit:"kg"},
+  {item:"tel", aliases:["tel","tail","oil"], price:150, unit:"litre"},
+  {item:"dal", aliases:["dal","daal","lentil"], price:110, unit:"kg"},
+  {item:"chini", aliases:["chini","cheeni","sugar"], price:42, unit:"kg"},
+  {item:"namak", aliases:["namak","salt"], price:25, unit:"kg"},
+  {item:"sabun", aliases:["sabun","soap"], price:35, unit:"piece"},
+];
+const HINDI = {ek:1,do:2,teen:3,char:4,paanch:5,chhe:6,saat:7,aath:8,nau:9,das:10,aadha:0.5,dedh:1.5,half:0.5};
+function parseOrder(text){
+  const lower = text.toLowerCase();
+  const items = [];
+  for (const p of PRODUCTS){
+    for (const alias of p.aliases){
+      const re = new RegExp("\\b"+alias+"\\b");
+      const m = lower.match(re);
+      if(!m) continue;
+      const before = lower.slice(Math.max(0, m.index-25), m.index);
+      const tokens = before.match(/(\d+(?:\.\d+)?|[a-z]+)/g) || [];
+      let qty = 1;
+      for (let i=tokens.length-1;i>=0;i--){
+        const t = tokens[i];
+        if(!isNaN(parseFloat(t))){ qty = parseFloat(t); break; }
+        if(HINDI[t]!==undefined){ qty = HINDI[t]; break; }
+      }
+      items.push({item:p.item, quantity:qty, unit:p.unit, price:p.price, total:Math.round(qty*p.price*100)/100});
+      break;
+    }
+  }
+  const total = Math.round(items.reduce((s,i)=>s+i.total,0)*100)/100;
+  return {items, total};
+}
+function runDemo(){
+  const text = document.getElementById("orderText").value;
+  const {items, total} = parseOrder(text);
+  const res = document.getElementById("result");
+  res.classList.add("show");
+  document.getElementById("rText").textContent = text;
+  if(!items.length){
+    document.getElementById("rItems").innerHTML = "<p>Sorry, main aapka order samajh nahi paya. Jaise bolo: “2 kg atta”.</p>";
+    document.getElementById("rTotal").textContent = "";
+    document.getElementById("rConfirm").textContent = "Ye item price list me nahi hai to agent rate guess nahi karega — dukandar se poochhega.";
+  } else {
+    document.getElementById("rItems").innerHTML = "<ul>" + items.map(i=>`<li>${i.quantity} ${i.unit} ${i.item} — ₹${i.total}</li>`).join("") + "</ul>";
+    document.getElementById("rTotal").textContent = "Total: ₹" + total;
+    document.getElementById("rConfirm").textContent = `Aapka order: ${items.map(i=>`${i.quantity} ${i.unit} ${i.item}`).join(", ")}. Total ${total} rupaye. Confirm karne ke liye haan bolo.`;
+  }
+  document.getElementById("savedMsg").textContent = "";
+}
+document.getElementById("tryBtn").onclick = runDemo;
+document.getElementById("noisyBtn").onclick = ()=>{ document.getElementById("orderText").value="2 kg aata chahiye"; runDemo(); };
+document.getElementById("unknownBtn").onclick = ()=>{ document.getElementById("orderText").value="5 kg gold chahiye"; runDemo(); };
+document.getElementById("saveBtn").onclick = ()=>{ document.getElementById("savedMsg").textContent="✓ Order shopkeeper dashboard ko bhej diya gaya (demo me). Backend me ye order SQLite me save hota hai."; };
+runDemo();
+</script>
+</body>
+</html>
