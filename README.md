@@ -22,6 +22,96 @@
 4. Also try the noisy test (`2 kg aata`) and the unknown-item test (`5 kg gold`).
    The agent must **not** invent a price for gold.
 
+---
+
+## Classical Website Demo — Full Preview
+
+> This section shows the complete classical website demo right here in the
+> README. The live, clickable version is `website/index.html` in this
+> repository. The demo below uses the same shop price list and the same
+> order logic as the backend.
+
+### Shop signboard
+
+> **✦ Sharma Kirana Store ✦**
+>
+> # Bolkar Order Karo
+>
+> *“Speak, and the order is done.” — Speak in Hinglish, order done.*
+>
+> 🎙️ Gnani **Prisma STT** + **Timbre TTS** • ✅ Parser eval **20 / 20 PASS**
+> • 🏆 Great Indian **AI Internship Challenge** • 🛒 No invented prices
+
+### Live demo — three cases, fully shown
+
+**Case 1 — Normal order (the happy path)**
+
+- Customer says: `2 kg atta aur 1 litre tel chahiye`
+- Agent understands: 2 kg atta, 1 litre tel
+- Calculation: 2 × ₹45 (atta) + 1 × ₹150 (tel) = **₹240**
+- Voice confirmation: *“Aapka order: 2 kg atta, 1 litre tel. Total 240 rupaye. Confirm karne ke liye haan bolo.”*
+- Shopkeeper action: order appears on the dashboard, Accept or Reject in one tap.
+
+**Case 2 — Noisy speech (the hard path)**
+
+- Customer says: `2 kg aata chahiye` (a common noisy-speech version of “atta”)
+- Agent understands: 2 kg atta, after noisy-speech correction
+- Calculation: 2 × ₹45 = **₹90**
+- Voice confirmation: *“Aapka order: 2 kg atta. Total 90 rupaye.”*
+- Why it matters: this is the Noise Canceller award case. Clean-microphone
+  demos are easy. Noisy, phone-like speech is where real voice agents fail.
+
+**Case 3 — Unknown item (the honesty test)**
+
+- Customer says: `5 kg gold chahiye`
+- Agent understands: no matching shop item
+- Calculation: **₹0 — no price invented**
+- Agent response: *“Sorry, I could not understand your order. Please say the
+  item and quantity again, for example ‘2 kg atta’.”* In the full app, this
+  goes to clarification or to the shopkeeper as a human handoff.
+- Why it matters: an agent that guesses a price for gold cannot be trusted
+  with a real shop's money.
+
+### How it works — four steps, as shown on the website
+
+1. **Speak.** The customer speaks in Hinglish on a phone or browser.
+2. **Listen.** Gnani Prisma STT converts speech to text, including
+   code-mixed Hinglish.
+3. **Match and total.** The agent matches items only against the shop price
+   list, calculates the total, and asks for clarification for unknown items.
+4. **Confirm and hand off.** Gnani Timbre TTS speaks the confirmation back.
+   The customer says yes to confirm, no to cancel, and difficult cases go
+   to the shopkeeper.
+
+### Shop price list — synthetic demo data
+
+| Item | Rate | Item | Rate |
+|---|---|---|---|
+| Atta | ₹45 / kg | Chawal | ₹60 / kg |
+| Tel | ₹150 / litre | Dal | ₹110 / kg |
+| Chini | ₹42 / kg | Namak | ₹25 / kg |
+| Sabun | ₹35 / piece | — | — |
+
+### Why this wins — as shown on the website
+
+- **Mixed Vibes:** Hinglish code-mixed voice experience.
+- **Real Deal:** kirana customer + shopkeeper, a real everyday problem.
+- **Noise Canceller:** tested on noisy / phone-like audio, with results shown.
+- **Small Town, Big Build:** built from Jajpur, Odisha (Tier 2/3 story).
+
+### Tested, not just claimed — as shown on the website
+
+- Parser evaluation: **20 / 20 PASS**
+- Live server tested: health, order, search, accept, WebSocket confirmation
+- Failures are not hidden: they are recorded in the evaluation sheet.
+
+> **To run the live, clickable demo:** open `website/index.html` in any
+> browser. For live voice with a microphone and the real Gnani API, run
+> the backend in `backend/` and open `frontend/index.html` instead.
+> Full steps are in `TESTING.md`.
+
+---
+
 ## Why this is not just another chatbot
 
 - **Hinglish first** — code-mixed speech, Hindi number words, and noisy, phone-like audio.
