@@ -115,6 +115,20 @@ async def voice_order(
     audio_bytes = await file.read() if file is not None else b""
     if not config.MOCK_MODE and not audio_bytes:
         raise HTTPException(400, "Real mode needs an audio file upload.")
+    # Gnani rejects webm outright (supported: ogg, wav, mp3, aac, m4a,
+    # flac). The current frontend converts to WAV before upload, but an
+    # old frontend sending webm should get a clear error, not a Gnani
+    # ffmpeg dump.
+    if not config.MOCK_MODE and file is not None:
+        _ct = (file.content_type or "").lower()
+        _fn = (file.filename or "").lower()
+        if "webm" in _ct or _fn.endswith(".webm"):
+            raise HTTPException(
+                400,
+                "Gnani does not support webm audio. Please pull the latest "
+                "frontend, which converts the recording to WAV before upload, "
+                "then record again.",
+            )
     # AUDIO FORMAT FIX (was the real-mode STT bug): the browser records
     # webm/opus, but the old code always told Gnani the file was
     # "audio.wav", so Gnani's ffmpeg failed with "invalid start code in

@@ -237,6 +237,38 @@ function audioFilenameFor(mime){
   if(mime.includes("mpeg") || mime.includes("mp3")) return "order.mp3";
   return "order.webm";
 }
+// WAV conversion: Gnani STT supports ogg, wav, mp3, aac, m4a, flac —
+// NOT webm. Chrome records webm, so we decode it in the browser and
+// re-encode as 16-bit PCM WAV before upload. No ffmpeg install needed
+// on Windows, and no external library is used.
+function encodeWAV(audioBuffer){
+  const numChannels = 1; // mono is enough for speech, and smaller to send
+  const sampleRate = audioBuffer.sampleRate;
+  const channel = audioBuffer.getChannelData(0);
+  // If stereo, average the channels into mono.
+  let samples = channel;
+  if(audioBuffer.numberOfChannels > 1){
+    const other = audioBuffer.getChannelData(1);
+    samples = new Float32Array(channel.length);
+    for(let i = 0; i < channel.length; i++) samples[i] = (channel[i] + other[i]) / 2;
+  }
+  const dataLength = samples.length * 2;
+  const buffer = new ArrayBuffer(44 + dataLength);
+  const view = new DataView(buffer);
+  function writeString(offset, str){ for(let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); }
+  writeString(0, "RIFF"); view.setUint32(4, 36 + dataLength, true); writeString(8, "WAVE");
+  writeString(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * 2, true); view.setUint16(32, numChannels * 2, true);
+  view.setUint16(34, 16, true); writeString(36, "data"); view.setUint32(40, dataLength, true);
+  let offset = 44;
+  for(let i = 0; i < samples.length; i++){
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    offset += 2;
+  }
+  return new Blob([buffer], { type: "audio/wav" });
+}
 $("recordBtn").onclick = async () => {
   if(mediaRecorder && mediaRecorder.state === "recording"){ mediaRecorder.stop(); return; }
   try{
@@ -248,11 +280,26 @@ $("recordBtn").onclick = async () => {
     const mime = candidates.find(m => !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m))) || "";
     mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
+    mediaRecorder.onstop = async () => {
       const realMime = mediaRecorder.mimeType || "audio/webm";
-      window._audioBlob = new Blob(chunks, { type: realMime });
-      window._audioFilename = audioFilenameFor(realMime);
-      $("recStatus").textContent = "Recording ready (" + realMime + "). In mock mode the text above is used as the transcript; in real mode this audio goes to Gnani.";
+      const rawBlob = new Blob(chunks, { type: realMime });
+      // Real mode: always send WAV, because Gnani rejects webm outright.
+      // Mock mode: WAV also works, since mock ignores the audio bytes.
+      try{
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const decoded = await ctx.decodeAudioData(await rawBlob.arrayBuffer());
+        window._audioBlob = encodeWAV(decoded);
+        window._audioFilename = "order.wav";
+        $("recStatus").textContent = "Recording ready, converted to WAV for Gnani (" + realMime + " → audio/wav). In mock mode the text above is used as the transcript; in real mode this WAV goes to Gnani.";
+        await ctx.close();
+      }catch(e){
+        // Fallback: send the raw recording; Gnani may reject webm, and
+        // that error will now be shown clearly instead of silently.
+        window._audioBlob = rawBlob;
+        window._audioFilename = audioFilenameFor(realMime);
+        $("recStatus").textContent = "Recording ready, but WAV conversion failed (" + e.message + "). Sending raw audio — Gnani may reject webm.";
+      }
       $("recordBtn").textContent = "🎙️ Record"; $("recordBtn").classList.remove("recording");
       stream.getTracks().forEach(t=>t.stop());
     };
