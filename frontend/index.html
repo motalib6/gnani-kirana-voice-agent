@@ -229,15 +229,30 @@ async function setStatus(id, action){
 document.querySelectorAll("[data-example]").forEach(btn=>{
   btn.onclick = ()=>{ $("mockText").value = btn.dataset.example; $("mockText").focus(); };
 });
+function audioFilenameFor(mime){
+  if(mime.includes("webm")) return "order.webm";
+  if(mime.includes("mp4") || mime.includes("m4a")) return "order.m4a";
+  if(mime.includes("ogg")) return "order.ogg";
+  if(mime.includes("wav")) return "order.wav";
+  if(mime.includes("mpeg") || mime.includes("mp3")) return "order.mp3";
+  return "order.webm";
+}
 $("recordBtn").onclick = async () => {
   if(mediaRecorder && mediaRecorder.state === "recording"){ mediaRecorder.stop(); return; }
   try{
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    chunks = []; mediaRecorder = new MediaRecorder(stream);
+    chunks = [];
+    // Pick a format the browser actually supports, and keep its real
+    // type — sending webm bytes labelled as wav broke Gnani's ffmpeg.
+    const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", ""];
+    const mime = candidates.find(m => !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m))) || "";
+    mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => chunks.push(e.data);
     mediaRecorder.onstop = () => {
-      window._audioBlob = new Blob(chunks, { type: "audio/webm" });
-      $("recStatus").textContent = "Recording ready. In mock mode the text above is used as the transcript; in real mode this audio goes to Gnani.";
+      const realMime = mediaRecorder.mimeType || "audio/webm";
+      window._audioBlob = new Blob(chunks, { type: realMime });
+      window._audioFilename = audioFilenameFor(realMime);
+      $("recStatus").textContent = "Recording ready (" + realMime + "). In mock mode the text above is used as the transcript; in real mode this audio goes to Gnani.";
       $("recordBtn").textContent = "🎙️ Record"; $("recordBtn").classList.remove("recording");
       stream.getTracks().forEach(t=>t.stop());
     };
@@ -252,7 +267,7 @@ $("sendBtn").onclick = async () => {
     const form = new FormData();
     form.append("mock_text", $("mockText").value);
     form.append("customer_name", "Demo Customer");
-    if(window._audioBlob) form.append("file", window._audioBlob, "order.webm");
+    if(window._audioBlob) form.append("file", window._audioBlob, window._audioFilename || "order.webm");
     const res = await fetch(API + "/api/voice-order", { method: "POST", body: form });
     const data = await res.json();
     if(!res.ok) throw new Error(data.detail || "Voice order failed");
@@ -262,8 +277,9 @@ $("sendBtn").onclick = async () => {
       audio.play().catch(()=>{});
     }
   }catch(e){
-    showResult({ transcript: $("mockText").value, confirmation_text: "Error: " + e.message + " — Is the backend running on port 8000?" }, true);
-    toast("Order failed. Check that uvicorn is running.");
+    const note = /fetch|Failed to fetch/i.test(e.message) ? " — Is the backend running on port 8000?" : "";
+    showResult({ transcript: $("mockText").value, confirmation_text: "Error: " + e.message + note }, true);
+    toast("Order failed." + (note ? " Check that uvicorn is running." : " See the error in the result card."));
   }finally{ btn.disabled = false; btn.textContent = "Order samjho →"; }
 };
 $("saveBtn").onclick = async () => {

@@ -115,8 +115,32 @@ async def voice_order(
     audio_bytes = await file.read() if file is not None else b""
     if not config.MOCK_MODE and not audio_bytes:
         raise HTTPException(400, "Real mode needs an audio file upload.")
+    # AUDIO FORMAT FIX (was the real-mode STT bug): the browser records
+    # webm/opus, but the old code always told Gnani the file was
+    # "audio.wav", so Gnani's ffmpeg failed with "invalid start code in
+    # RIFF header". Now the real uploaded filename / content type is
+    # passed through, so Gnani converts the actual format.
+    filename = "audio.webm"
+    if file is not None:
+        content_type = (file.content_type or "").lower()
+        ext = None
+        if "webm" in content_type:
+            ext = ".webm"
+        elif "mp4" in content_type or "m4a" in content_type:
+            ext = ".m4a"
+        elif "ogg" in content_type:
+            ext = ".ogg"
+        elif "wav" in content_type or "x-wav" in content_type:
+            ext = ".wav"
+        elif "mpeg" in content_type or "mp3" in content_type:
+            ext = ".mp3"
+        if ext:
+            base = (file.filename or "audio").rsplit(".", 1)[0]
+            filename = base + ext
+        elif file.filename:
+            filename = file.filename
     try:
-        transcript = CLIENT.transcribe(audio_bytes, mock_text=mock_text)
+        transcript = CLIENT.transcribe(audio_bytes, filename=filename, mock_text=mock_text)
     except Exception as exc:
         raise HTTPException(502, f"Gnani STT failed: {exc}") from exc
     parsed = agent.parse_order(transcript, PRICE_LIST)
