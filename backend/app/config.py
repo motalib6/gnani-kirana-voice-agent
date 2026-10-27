@@ -1,5 +1,21 @@
-"""Configuration. Keys come only from environment variables, never from code."""
+"""Configuration. Keys come only from environment variables, never from code.
+
+.env handling (this was the real-mode bug): earlier versions read only
+os.getenv() and never loaded backend/.env, so a correct .env file was
+silently ignored and mock mode stayed on. Now backend/.env is loaded
+here, before any setting is read. A variable already set in the
+shell still wins over .env (load_dotenv does not override by default).
+"""
 import os
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except Exception:
+    # Mock mode works without python-dotenv; real mode needs it installed.
+    pass
 
 
 def _env(name, default=""):
