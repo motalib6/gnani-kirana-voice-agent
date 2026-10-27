@@ -4,127 +4,287 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bolkar Order Karo — Kirana Hinglish Voice Agent</title>
+<meta name="description" content="Speak in Hinglish. Your kirana order is understood, priced from the real shop list, confirmed by voice, and sent to the shopkeeper.">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; line-height: 1.5; }
-  button { padding: 10px 16px; font-size: 16px; cursor: pointer; }
-  input, textarea { width: 100%; padding: 10px; font-size: 16px; margin: 6px 0 12px; }
-  .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0; }
-  .muted { color: #555; font-size: 14px; }
+  :root{
+    --bg:#f6f3ee; --card:#ffffff; --ink:#1f1b16; --muted:#6b6257; --line:#e7dfd2;
+    --maroon:#7b2d26; --maroon2:#5e211d; --gold:#b8860b; --green:#1f7a3a; --red:#b42318;
+    --soft:#fdf6e3; --radius:18px; --shadow:0 10px 30px rgba(31,27,22,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+  a{color:var(--maroon)}
+  .topbar{background:var(--maroon2);color:#fff;padding:14px 0;position:sticky;top:0;z-index:10}
+  .topbar-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .brand{font-family:Georgia,serif;font-size:22px;font-weight:700;letter-spacing:.2px}
+  .brand small{display:block;font-family:system-ui,sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#e8c874;font-weight:600}
+  .pill{font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.12)}
+  .pill.ok{border-color:#9ed5a8;background:#1f7a3a}
+  .pill.warn{border-color:#f0c36b;background:#7a4a00}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 56px}
+  .hero{margin:6px 0 22px}
+  .hero h1{font-family:Georgia,serif;font-size:42px;line-height:1.1;margin:0 0 8px}
+  .hero p{color:var(--muted);font-size:18px;margin:0;max-width:760px}
+  .steps{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+  .step{flex:1;min-width:180px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+  .step b{display:block;color:var(--maroon)}
+  .step span{color:var(--muted);font-size:14px}
+  .step.active{border-color:var(--maroon);box-shadow:var(--shadow)}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}.hero h1{font-size:32px}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+  .card h2{margin:0 0 4px;font-size:21px}
+  .card h3{margin:18px 0 8px;font-size:17px}
+  .muted{color:var(--muted);font-size:14px}
+  label{font-weight:600;font-size:14px;display:block;margin:12px 0 6px}
+  input,textarea{width:100%;padding:12px 14px;font-size:16px;border:1px solid #cfc4b0;border-radius:12px;background:#fffdf5;color:var(--ink)}
+  input:focus,textarea:focus{outline:3px solid #f0d48a;border-color:var(--gold)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--maroon)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{border:0;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:650;cursor:pointer}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .btn-primary{background:var(--maroon);color:#fff;flex:1;min-width:170px}
+  .btn-secondary{background:#fff;color:var(--maroon);border:1px solid var(--maroon)}
+  .btn-small{padding:8px 12px;font-size:13px}
+  .btn-accept{background:var(--green);color:#fff}
+  .btn-reject{background:#fff;color:var(--red);border:1px solid var(--red)}
+  .recording{animation:pulse 1.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(180,35,24,.35)}100%{box-shadow:0 0 0 12px rgba(180,35,24,0)}}
+  .result{margin-top:16px;border:1px solid #e2c98a;background:var(--soft);border-radius:14px;padding:16px;display:none}
+  .result.show{display:block}
+  .result.error{border-color:#f0a8a0;background:#fff1f0}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .total{font-size:26px;font-weight:800;color:var(--maroon);margin-top:8px}
+  .badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;text-transform:capitalize}
+  .badge.pending{background:#fff3cd;color:#7a4a00}
+  .badge.accepted{background:#dff3e4;color:#1f7a3a}
+  .badge.rejected{background:#fde3e0;color:#b42318}
+  .order-item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:10px 0}
+  .order-item:last-child{border-bottom:0}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:11px 18px;font-size:14px;display:none;z-index:20;max-width:92vw;text-align:center}
+  .toast.show{display:block}
+  .price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .price{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fffdf5}
+  .price b{display:block}
+  .price span{color:var(--muted);font-size:13px}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:26px}
+  .sr{position:absolute;left:-9999px}
 </style>
 </head>
 <body>
-<h1>Bolkar Order Karo</h1>
-<p class="muted">Kirana Hinglish voice order agent. Gnani Prisma STT + Timbre TTS.
-Synthetic demo data only — no real customer data.</p>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Bolkar Order Karo<small>Kirana • Hinglish • Voice</small></div>
+    <div>
+      <span class="pill" id="statusPill">Checking backend…</span>
+      <a href="/website" style="color:#e8c874;margin-left:10px;font-size:14px">Classical demo →</a>
+    </div>
+  </div>
+</header>
 
-<div class="card">
-  <h2>1. Bolo ya likho</h2>
-  <p class="muted">Backend pehle <code>uvicorn app.main:app --reload --port 8000</code> se chalao (backend/ folder se).</p>
-  <label>Test ke liye Hinglish text (mock mode me yehi transcript banega):</label>
-  <input id="mockText" value="2 kg atta aur 1 litre tel chahiye">
-  <button id="recordBtn">🎙️ Record (browser mic)</button>
-  <button id="sendBtn">Order bhejo</button>
-  <p id="recStatus" class="muted"></p>
-</div>
+<main class="wrap">
+  <section class="hero">
+    <h1>Speak. Confirm. Order done.</h1>
+    <p>Order from a kirana shop by speaking Hinglish — no English typing, no paper notes, no guessed prices. The agent prices only from the shop list and asks the shopkeeper when it is unsure.</p>
+    <div class="steps" aria-label="Order steps">
+      <div class="step active" id="step1"><b>1 · Speak / type</b><span>Your Hinglish order, by mic or text</span></div>
+      <div class="step" id="step2"><b>2 · Confirm</b><span>Check items, total and voice confirmation</span></div>
+      <div class="step" id="step3"><b>3 · Shopkeeper</b><span>Accept or reject in one tap</span></div>
+    </div>
+  </section>
 
-<div class="card">
-  <h2>2. Agent ka jawab</h2>
-  <p><b>Transcript:</b> <span id="transcript">—</span></p>
-  <p><b>Confirmation:</b> <span id="confirmation">—</span></p>
-  <p><b>Total:</b> <span id="total">—</span></p>
-  <ul id="items"></ul>
-  <button id="saveBtn" disabled>Shopkeeper ko order bhejo (Save)</button>
-</div>
+  <div class="grid">
+    <section class="card" aria-labelledby="order-heading">
+      <h2 id="order-heading">🗣️ Your order</h2>
+      <p class="muted">Keep the backend running (<code>uvicorn app.main:app --reload --port 8000</code>). In mock mode the text below is used as the transcript. In real mode your recorded audio goes to Gnani.</p>
 
-<div class="card">
-  <h2>3. Shopkeeper dashboard</h2>
-  <button id="refreshBtn">Orders refresh karo</button>
-  <ul id="orders"></ul>
-</div>
+      <label for="mockText">Order in Hinglish</label>
+      <textarea id="mockText" rows="2">2 kg atta aur 1 litre tel chahiye</textarea>
 
-<div class="card">
-  <h2>4. RAG search (sirf dukaan ka data)</h2>
-  <p class="muted">Jaise: "delivery kab hoti hai?" ya "atta ka rate?"</p>
-  <input id="searchBox" value="delivery kab hoti hai?">
-  <button id="searchBtn">Search karo</button>
-  <ul id="searchResults"></ul>
-</div>
+      <div class="chips" aria-label="Try these examples">
+        <button type="button" class="chip" data-example="2 kg atta aur 1 litre tel chahiye">✓ Normal · ₹240</button>
+        <button type="button" class="chip" data-example="2 kg aata chahiye">Noisy · aata → atta</button>
+        <button type="button" class="chip" data-example="5 kg gold chahiye">Unknown · gold → ₹0</button>
+        <button type="button" class="chip" data-example="do kg chawal aur 1 kg dal chahiye">Hindi numbers</button>
+      </div>
+
+      <div class="row">
+        <button type="button" class="btn-primary" id="sendBtn">Order samjho →</button>
+        <button type="button" class="btn-secondary" id="recordBtn">🎙️ Record</button>
+      </div>
+      <p class="muted" id="recStatus" role="status"></p>
+
+      <div class="result" id="result" aria-live="polite">
+        <div><b>Transcript:</b> <span id="transcript">—</span></div>
+        <div id="items"></div>
+        <div class="total" id="total"></div>
+        <p id="confirmation" style="font-style:italic"></p>
+        <p class="muted" id="ttsNote"></p>
+        <div class="row">
+          <button type="button" class="btn-primary" id="saveBtn" disabled>Shopkeeper ko bhejo</button>
+        </div>
+      </div>
+
+      <h3>💰 Shop price list <span class="muted">(from the API, not hard-coded)</span></h3>
+      <div class="price-grid" id="priceGrid"><p class="muted">Loading prices…</p></div>
+    </section>
+
+    <aside>
+      <section class="card" aria-labelledby="dash-heading">
+        <h2 id="dash-heading">🧑‍🌾 Shopkeeper dashboard</h2>
+        <p class="muted">New orders appear here. Accept or reject with one tap.</p>
+        <div class="row">
+          <button type="button" class="btn-secondary btn-small" id="refreshBtn">↻ Refresh orders</button>
+        </div>
+        <div id="orders" style="margin-top:12px"><p class="muted">Loading orders…</p></div>
+      </section>
+
+      <section class="card" style="margin-top:18px" aria-labelledby="search-heading">
+        <h2 id="search-heading">🔍 Ask the shop</h2>
+        <p class="muted">Search only shop products and FAQs. The agent never invents a price.</p>
+        <label for="searchBox" class="sr">Search the shop</label>
+        <input id="searchBox" value="delivery kab hoti hai?">
+        <div class="row"><button type="button" class="btn-secondary" id="searchBtn">Search</button></div>
+        <ul id="searchResults"></ul>
+      </section>
+
+      <section class="card" style="margin-top:18px">
+        <h2>✓ Trust notes</h2>
+        <ul>
+          <li>Unknown items get <b>₹0</b>, never a guessed price.</li>
+          <li>An order is saved only after you send it, and accepted only by the shopkeeper.</li>
+          <li>Synthetic demo data only — no real customer calls or personal data.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+
+  <footer>Bolkar Order Karo · Built on Gnani Prisma STT + Timbre TTS · <a href="/website">Classical website demo</a> · <a href="/health">API health</a></footer>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 // Linked mode: when served from the backend (http://127.0.0.1:8000/),
 // use the same origin (empty string = relative /api/... calls).
 // When opened as a plain file, fall back to the local backend.
 const API = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
+const $ = id => document.getElementById(id);
 let lastOrder = null;
 let mediaRecorder = null, chunks = [];
 
-document.getElementById("recordBtn").onclick = async () => {
-  try {
+function toast(msg){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 3200);
+}
+function setStep(n){
+  ["step1","step2","step3"].forEach((id,i)=>$(id).classList.toggle("active", i === n-1));
+}
+function showResult(data, isError){
+  const r = $("result"); r.classList.add("show"); r.classList.toggle("error", !!isError);
+  $("transcript").textContent = data.transcript || "—";
+  $("confirmation").textContent = data.confirmation_text || "";
+  $("total").textContent = (data.total != null && !isError) ? "Total: ₹" + data.total : "";
+  $("ttsNote").textContent = data.tts_error ? "Voice note: " + data.tts_error : (data.confirmation_audio_base64 ? "Voice confirmation audio is available from the API." : "");
+  $("items").innerHTML = (data.items || []).map(i =>
+    `<div style="display:flex;justify-content:space-between;gap:10px"><span>${i.quantity} ${i.unit} ${i.item}</span><b>₹${i.line_total}</b></div>`).join("")
+    || "<p>No items matched. Try an example above.</p>";
+  $("saveBtn").disabled = !(data.items && data.items.length);
+  setStep(data.items && data.items.length ? 2 : 1);
+}
+async function loadHealth(){
+  try{
+    const res = await fetch(API + "/health"); const d = await res.json();
+    const pill = $("statusPill");
+    pill.textContent = d.mock_mode ? "● Backend connected · Mock mode" : "● Backend connected · Real Gnani mode";
+    pill.className = "pill " + (d.mock_mode ? "warn" : "ok");
+  }catch(e){
+    const pill = $("statusPill"); pill.textContent = "● Backend not reachable — start uvicorn first"; pill.className = "pill warn";
+  }
+}
+async function loadPrices(){
+  try{
+    const res = await fetch(API + "/api/products"); const d = await res.json();
+    $("priceGrid").innerHTML = (d.products || []).map(p =>
+      `<div class="price"><b>${p.item}</b><span>₹${p.price_per_unit} / ${p.unit}</span></div>`).join("");
+  }catch(e){ $("priceGrid").innerHTML = "<p class='muted'>Prices could not be loaded. Is the backend running?</p>"; }
+}
+async function loadOrders(){
+  try{
+    const res = await fetch(API + "/api/orders"); const data = await res.json();
+    $("orders").innerHTML = (data.orders || []).map(o =>
+      `<div class="order-item"><div><b>#${o.id} · ₹${o.total}</b> <span class="badge ${o.status}">${o.status}</span><br><span class="muted">${o.items.map(i => i.quantity + " " + i.unit + " " + i.item).join(", ")}</span></div>
+       <div><button class="btn-accept btn-small" onclick="setStatus(${o.id}, 'accept')">Accept</button>
+       <button class="btn-reject btn-small" onclick="setStatus(${o.id}, 'reject')">Reject</button></div></div>`).join("")
+      || "<p class='muted'>No orders yet. Send an order from the left panel, then save it.</p>";
+  }catch(e){ $("orders").innerHTML = "<p class='muted'>Orders could not be loaded. Is the backend running?</p>"; }
+}
+async function setStatus(id, action){
+  try{ await fetch(API + "/api/orders/" + id + "/" + action, { method: "POST" }); toast("Order #" + id + " " + action + "ed."); loadOrders(); setStep(3); }
+  catch(e){ toast("Could not update that order. Is the backend running?"); }
+}
+document.querySelectorAll("[data-example]").forEach(btn=>{
+  btn.onclick = ()=>{ $("mockText").value = btn.dataset.example; $("mockText").focus(); };
+});
+$("recordBtn").onclick = async () => {
+  if(mediaRecorder && mediaRecorder.state === "recording"){ mediaRecorder.stop(); return; }
+  try{
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    chunks = [];
-    mediaRecorder = new MediaRecorder(stream);
+    chunks = []; mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => chunks.push(e.data);
     mediaRecorder.onstop = () => {
-      document.getElementById("recStatus").textContent =
-        "Recording ready. Mock mode me text wala transcript use hoga — real mode me ye audio file backend ko jayegi.";
       window._audioBlob = new Blob(chunks, { type: "audio/webm" });
+      $("recStatus").textContent = "Recording ready. In mock mode the text above is used as the transcript; in real mode this audio goes to Gnani.";
+      $("recordBtn").textContent = "🎙️ Record"; $("recordBtn").classList.remove("recording");
+      stream.getTracks().forEach(t=>t.stop());
     };
     mediaRecorder.start();
-    document.getElementById("recStatus").textContent = "Recording... dobara dabao to stop hoga.";
-    document.getElementById("recordBtn").onclick = () => {
-      mediaRecorder.stop();
-      document.getElementById("recordBtn").textContent = "🎙️ Record (browser mic)";
-    };
-    document.getElementById("recordBtn").textContent = "⏹️ Stop recording";
-  } catch (e) {
-    document.getElementById("recStatus").textContent = "Mic nahi mila: " + e.message + " — text box se test karo.";
-  }
+    $("recStatus").textContent = "Recording… press Record again to stop.";
+    $("recordBtn").textContent = "⏹ Stop recording"; $("recordBtn").classList.add("recording");
+  }catch(e){ $("recStatus").textContent = "Mic not available: " + e.message + " — use the text box to test."; }
 };
-
-document.getElementById("sendBtn").onclick = async () => {
-  const form = new FormData();
-  form.append("mock_text", document.getElementById("mockText").value);
-  form.append("customer_name", "Demo Customer");
-  if (window._audioBlob) form.append("file", window._audioBlob, "order.webm");
-  const res = await fetch(API + "/api/voice-order", { method: "POST", body: form });
-  const data = await res.json();
-  document.getElementById("transcript").textContent = data.transcript || "—";
-  document.getElementById("confirmation").textContent = data.confirmation_text || "—";
-  document.getElementById("total").textContent = data.total != null ? "Rs " + data.total : "—";
-  document.getElementById("items").innerHTML = (data.items || []).map(i =>
-    `<li>${i.quantity} ${i.unit} ${i.item} — Rs ${i.line_total}</li>`).join("");
-  lastOrder = data;
-  document.getElementById("saveBtn").disabled = !(data.items && data.items.length);
+$("sendBtn").onclick = async () => {
+  const btn = $("sendBtn"); btn.disabled = true; btn.textContent = "Samajh raha hoon…";
+  try{
+    const form = new FormData();
+    form.append("mock_text", $("mockText").value);
+    form.append("customer_name", "Demo Customer");
+    if(window._audioBlob) form.append("file", window._audioBlob, "order.webm");
+    const res = await fetch(API + "/api/voice-order", { method: "POST", body: form });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail || "Voice order failed");
+    lastOrder = data; showResult(data, false);
+    if(data.confirmation_audio_base64){
+      const audio = new Audio("data:audio/wav;base64," + data.confirmation_audio_base64);
+      audio.play().catch(()=>{});
+    }
+  }catch(e){
+    showResult({ transcript: $("mockText").value, confirmation_text: "Error: " + e.message + " — Is the backend running on port 8000?" }, true);
+    toast("Order failed. Check that uvicorn is running.");
+  }finally{ btn.disabled = false; btn.textContent = "Order samjho →"; }
 };
-
-document.getElementById("saveBtn").onclick = async () => {
-  await fetch(API + "/api/orders", { method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customer_name: "Demo Customer", items: lastOrder.items, total: lastOrder.total }) });
-  loadOrders();
+$("saveBtn").onclick = async () => {
+  if(!lastOrder) return;
+  try{
+    await fetch(API + "/api/orders", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customer_name: "Demo Customer", items: lastOrder.items, total: lastOrder.total }) });
+    toast("Order sent to the shopkeeper."); loadOrders(); setStep(3);
+  }catch(e){ toast("Could not save the order. Is the backend running?"); }
 };
-
-async function loadOrders() {
-  const res = await fetch(API + "/api/orders");
-  const data = await res.json();
-  document.getElementById("orders").innerHTML = (data.orders || []).map(o =>
-    `<li>#${o.id} — Rs ${o.total} — ${o.status} — ${o.items.map(i => i.quantity + " " + i.unit + " " + i.item).join(", ")}
-     <button onclick="setStatus(${o.id}, 'accept')">Accept</button>
-     <button onclick="setStatus(${o.id}, 'reject')">Reject</button></li>`).join("") || "<li>Abhi koi order nahi.</li>";
-}
-async function setStatus(id, action) {
-  await fetch(API + "/api/orders/" + id + "/" + action, { method: "POST" });
-  loadOrders();
-}
-document.getElementById("refreshBtn").onclick = loadOrders;
-document.getElementById("searchBtn").onclick = async () => {
-  const q = document.getElementById("searchBox").value;
-  const res = await fetch(API + "/api/search?q=" + encodeURIComponent(q));
-  const data = await res.json();
-  document.getElementById("searchResults").innerHTML = (data.results || []).map(r =>
-    `<li>[${r.type}] ${r.text}</li>`).join("") || "<li>Kuch nahi mila — agent rate guess nahi karega.</li>";
+$("refreshBtn").onclick = loadOrders;
+$("searchBtn").onclick = async () => {
+  try{
+    const q = $("searchBox").value;
+    const res = await fetch(API + "/api/search?q=" + encodeURIComponent(q));
+    const data = await res.json();
+    $("searchResults").innerHTML = (data.results || []).map(r => `<li>[${r.type}] ${r.text}</li>`).join("")
+      || "<li>No match — the agent will not guess a price.</li>";
+  }catch(e){ $("searchResults").innerHTML = "<li>Search failed. Is the backend running?</li>"; }
 };
-loadOrders();
+loadHealth(); loadPrices(); loadOrders();
 </script>
 </body>
 </html>
