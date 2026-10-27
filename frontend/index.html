@@ -51,7 +51,10 @@ Synthetic demo data only — no real customer data.</p>
 </div>
 
 <script>
-const API = "http://127.0.0.1:8000";
+// Linked mode: when served from the backend (http://127.0.0.1:8000/),
+// use the same origin (empty string = relative /api/... calls).
+// When opened as a plain file, fall back to the local backend.
+const API = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
 let lastOrder = null;
 let mediaRecorder = null, chunks = [];
 

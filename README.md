@@ -201,7 +201,7 @@ Key AI engineering decisions, not just a demo:
 - Language code: `hi-IN` for Hinglish STT in the gnani-vachana 0.8.2 client.
   That client accepts one STT language code only.
 
-## 5. Run it (mock mode first, no key needed)
+## 5. Run it — frontend + backend linked, one link (mock mode first, no key needed)
 
 ```bash
 cd backend
@@ -213,11 +213,20 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-Then open `frontend/index.html` in a browser, or visit:
+On Windows, double-click **`RUN_APP.bat`** in the repo root instead of
+typing the commands above. Keep that window open while you test.
 
+Then open **one link only** — the frontend and backend are now linked:
+
+- **App (frontend + backend): http://127.0.0.1:8000/**
+- Classical website demo: http://127.0.0.1:8000/website
 - Health: http://127.0.0.1:8000/health
 - Products: http://127.0.0.1:8000/api/products
 - Orders: http://127.0.0.1:8000/api/orders
+
+You no longer need to open `frontend/index.html` as a separate file.
+The backend serves it at `/`, so the frontend calls the API on the same
+origin. Opening the file directly still works as a fallback.
 
 Full testing steps, including the live server test, the WebSocket test,
 and the user's own real-key test, are in `TESTING.md`.

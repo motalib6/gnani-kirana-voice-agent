@@ -12,9 +12,11 @@ Real Gnani test (user's own key, in .env only):
     clear 502 message, never as a fake transcript.
 """
 import base64
+from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from . import agent, config, order_store, rag, tools
@@ -31,6 +33,28 @@ PRICE_LIST = agent.load_price_list()
 KNOWLEDGE_BASE = rag.load_knowledge_base()
 CLIENT = GnaniClient()
 PIPELINE = VoicePipeline(PRICE_LIST)
+
+# Linked frontend + backend: the repo root holds frontend/ and website/.
+# So http://127.0.0.1:8000/ shows the app, no separate file to open.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+FRONTEND_FILE = REPO_ROOT / "frontend" / "index.html"
+WEBSITE_FILE = REPO_ROOT / "website" / "index.html"
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    """Serve the linked frontend app from the same origin as the API."""
+    if FRONTEND_FILE.exists():
+        return FileResponse(FRONTEND_FILE, media_type="text/html")
+    return {"status": "ok", "message": "Frontend file not found. API is running — see /health."}
+
+
+@app.get("/website", include_in_schema=False)
+def website_demo():
+    """Serve the classical website demo from the same origin."""
+    if WEBSITE_FILE.exists():
+        return FileResponse(WEBSITE_FILE, media_type="text/html")
+    raise HTTPException(404, "Website demo file not found")
 
 
 class TextOrderRequest(BaseModel):
