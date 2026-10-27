@@ -25,6 +25,40 @@ MISHEARINGS = {
     "daal": "dal", "cheeni": "chini", "tail": "tel", "namk": "namak",
 }
 
+# Devanagari support: Gnani hi-IN STT often returns Hindi words in
+# Devanagari script, e.g. "एक के जी आटा" for "1 kg atta". The parser
+# below only matches Roman aliases, so transliterate Devanagari to
+# Roman FIRST, otherwise every real Hindi transcript scores 0 items.
+# "के जी" is how "kg" is spoken in Hindi, so it maps to "kg" as a phrase.
+DEVANAGARI_DIGITS = str.maketrans("०१२३४५६७८९", "0123456789")
+DEVANAGARI_WORDS = {
+    # Numbers
+    "एक": "ek", "दो": "do", "तीन": "teen", "चार": "char", "पाँच": "paanch",
+    "पांच": "paanch", "छह": "chhe", "छः": "chhe", "सात": "saat",
+    "आठ": "aath", "नौ": "nau", "दस": "das", "आधा": "aadha",
+    "डेढ़": "dedh", "देढ़": "dedh",
+    # Items
+    "आटा": "atta", "चावल": "chawal", "तेल": "tel", "दाल": "dal",
+    "चीनी": "chini", "नमक": "namak", "साबुन": "sabun",
+    # Units
+    "किलो": "kg", "किलोग्राम": "kg", "केजी": "kg",
+    "लीटर": "litre", "लिटर": "litre", "ग्राम": "gram",
+    "पीस": "piece", "पैकेट": "packet",
+    # Connectors / fillers (kept as Roman so quantity search still works)
+    "और": "aur", "चाहिए": "chahiye", "कृपया": "kripya",
+}
+
+
+def transliterate_devanagari(text):
+    """Convert Devanagari digits/words in `text` to Roman equivalents."""
+    text = text.translate(DEVANAGARI_DIGITS)
+    # Phrase first: "के जी" (spoken kg) must become one token, not "ke ji".
+    text = re.sub(r"के\s+जी", "kg", text)
+    text = re.sub(r"केजी", "kg", text)
+    for dev, roman in DEVANAGARI_WORDS.items():
+        text = re.sub(rf"(?<![\w\u0900-\u097f]){re.escape(dev)}(?![\w\u0900-\u097f])", roman, text)
+    return text
+
 
 def load_price_list():
     path = Path(__file__).parent / "price_list.json"
@@ -56,6 +90,9 @@ def _normalise(text):
 
 def parse_order(text, price_list):
     """Return (items, unknown_words, needs_clarification, total)."""
+    # Transliterate before anything else, so Devanagari transcripts
+    # ("एक के जी आटा") become Roman ("ek kg atta") for matching.
+    text = transliterate_devanagari(text)
     lowered = text.lower()
     # Apply known mishearings to the full text first, so exact matching
     # (with its quantity parsing) works for noisy transcripts too.
