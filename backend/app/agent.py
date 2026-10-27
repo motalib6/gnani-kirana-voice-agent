@@ -46,6 +46,12 @@ DEVANAGARI_WORDS = {
     "पीस": "piece", "पैकेट": "packet",
     # Connectors / fillers (kept as Roman so quantity search still works)
     "और": "aur", "चाहिए": "chahiye", "कृपया": "kripya",
+    # Search/FAQ words (so RAG search also works in Devanagari)
+    "दुकान": "dukaan", "कब": "kab", "खुलती": "khulti", "खुलता": "khulta",
+    "बंद": "band", "डिलीवरी": "delivery", "पेमेंट": "payment",
+    "कैसे": "kaise", "होती": "hoti", "है": "hai", "का": "ka",
+    "रेट": "rate", "क्या": "kya", "होगा": "hoga", "नहीं": "nahi",
+    "नही": "nahi", "मुझे": "mujhe", "बताओ": "batao",
 }
 
 

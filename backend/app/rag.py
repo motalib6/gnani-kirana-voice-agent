@@ -14,9 +14,21 @@ import json
 import re
 from pathlib import Path
 
+from .agent import MISHEARINGS, transliterate_devanagari
+
 
 def _tokens(text):
     return set(re.findall(r"[a-z]+", text.lower()))
+
+
+def _query_tokens(query):
+    """Normalise a search query the same way the parser does: Devanagari
+    -> Roman, then known mishearings -> real alias. Without this, a
+    Devanagari query scored 0 (tokens only match [a-z]+) and a noisy
+    spelling like 'chaval' missed 'chawal', so search looked inaccurate
+    even though the data was there."""
+    transliterated = transliterate_devanagari(query)
+    return {MISHEARINGS.get(t, t) for t in _tokens(transliterated)}
 
 
 def load_knowledge_base():
@@ -26,7 +38,7 @@ def load_knowledge_base():
 
 def retrieve(query, price_list, knowledge_base, top_k=3):
     """Return up to top_k matching docs, each with a score."""
-    q = _tokens(query)
+    q = _query_tokens(query)
     docs = []
     for product in price_list["products"]:
         text = " ".join([product["item"]] + product["aliases"])
