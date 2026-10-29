@@ -33,21 +33,31 @@ Gnani Timbre TTS speaks the confirmation back -> the order is saved for the
 shopkeeper to accept. Unknown items are never priced by guesswork; the agent
 asks a clarification question or hands off to the shopkeeper.
 
-## Each member's contribution (EDIT THIS — judges check it)
+## Each member's contribution
 
-- Member 1 (you): backend, Gnani STT/TTS integration, order parser,
-  evaluation, demo video. [Write your real share here.]
-- Member 2 (if any): frontend dashboard, price-list data, noisy-audio
-  testing. [Or delete this line if solo, and say "Solo build".]
+Solo build by Sk Motalib — backend, Gnani STT/TTS integration, order
+parser, evaluation, frontend, dashboard, demo video.
 
-## Results to fill after testing (do NOT invent these)
+## Nominated LinkedIn post (published 2026-10-29)
 
-- Test cases run: ___ / 20
-- Clean audio success: ___%
-- Noisy / phone-like audio success: ___%
-- Average STT+parse time: ___ ms
-- Credits used: ___ / 5000
-- Biggest failure found: ___, and how you fixed it: ___
+https://lnkd.in/p/dngANpeV
+Hashtags: #GnaniAI #GreatIndianAIInternshipChallenge #VoiceAI
+#Hinglish #AIForIndia #SovereignAI
+Before submitting, confirm on LinkedIn: video attached and plays,
+@Gnani AI is a blue mention, post is Public.
+
+## Results (verified — credits still to fill from dashboard)
+
+- Parser evaluation: 20/20 pass
+- Real voice test: Gnani STT + TTS worked in real mode, including
+  Devanagari "एक के जी आटा" -> 1 kg atta, Rs 45
+- Demo order: 2 kg atta + 1 litre tel = Rs 240
+- Credits used: ___ / 5000 (fill from Gnani dashboard, do NOT invent)
+- Biggest failures fixed: .env ignored (dotenv fix), webm rejected
+  (browser WAV conversion), Devanagari scored 0 (transliteration fix)
+
+See FINAL_SUBMISSION_PACKET.md for the full field-by-field copy-paste
+version for the Gnani form.
 
 ## LinkedIn / X post draft (edit, then post BEFORE submitting)
 
